@@ -4,18 +4,52 @@ import '../utilities/coin_data.dart';
 
 class PriceScreen extends StatefulWidget {
   const PriceScreen({Key? key}) : super(key: key);
-
   @override
   State<PriceScreen> createState() => _PriceScreenState();
 }
 
 class _PriceScreenState extends State<PriceScreen> {
-  List<Text> getPickerItems() {
+  String selectedCurrency = 'USD';
+
+  DropdownButton androidDropdown() {
+    return DropdownButton<String>(
+      value: selectedCurrency,
+      items: [
+        for (String currency in currenciesList)
+          DropdownMenuItem(
+            value: currency,
+            child: Text(currency),
+          ),
+      ],
+      onChanged: (value) {
+        setState(() {
+          selectedCurrency = value!;
+        });
+      },
+    );
+  }
+
+  CupertinoPicker iosPicker() {
     List<Text> pickerItems = [];
     for (String currency in currenciesList) {
       pickerItems.add(Text(currency));
     }
-    return pickerItems;
+    return CupertinoPicker(
+      itemExtent: 32.0,
+      onSelectedItemChanged: (selectedIndex) {
+        print(selectedIndex);
+      },
+      children: pickerItems,
+    );
+  }
+
+  Widget detectPlatform() {
+    bool isIOS = Theme.of(context).platform == TargetPlatform.iOS;
+    if (isIOS) {
+      return androidDropdown();
+    } else {
+      return iosPicker();
+    }
   }
 
   @override
@@ -52,13 +86,7 @@ class _PriceScreenState extends State<PriceScreen> {
             alignment: Alignment.center,
             padding: EdgeInsets.only(bottom: 30.0),
             child: Center(
-              child: CupertinoPicker(
-                itemExtent: 32.0,
-                onSelectedItemChanged: (selectedIndex) {
-                  print(selectedIndex);
-                },
-                children: getPickerItems(),
-              ),
+              child: detectPlatform(),
             ),
           )
         ],
