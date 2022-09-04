@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import '../utilities/coin_data.dart';
 
 class PriceScreen extends StatefulWidget {
-  const PriceScreen({Key? key}) : super(key: key);
+  const PriceScreen({super.key});
+
   @override
   State<PriceScreen> createState() => _PriceScreenState();
 }
@@ -22,9 +23,7 @@ class _PriceScreenState extends State<PriceScreen> {
           ),
       ],
       onChanged: (value) {
-        setState(() {
-          selectedCurrency = value!;
-        });
+        selectedCurrency = value!;
       },
     );
   }
@@ -43,17 +42,28 @@ class _PriceScreenState extends State<PriceScreen> {
     );
   }
 
-  Widget detectPlatform() {
-    bool isIOS = Theme.of(context).platform == TargetPlatform.iOS;
-    if (isIOS) {
-      return androidDropdown();
-    } else {
-      return iosPicker();
-    }
+  // Creates a variable to hold the value and use in Text Widget
+  dynamic bitCoinValueInUSD = '?';
+
+  // Creates an async method to await the coin data from coin_data.dart
+  void getData() async {
+    CoinData coin = CoinData();
+    double coinData = await coin.getCoinData();
+    setState(() {
+      bitCoinValueInUSD = coinData.toInt();
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Calls getData() method when the screen loads up
+    getData();
   }
 
   @override
   Widget build(BuildContext context) {
+    bool isIOS = Theme.of(context).platform == TargetPlatform.iOS;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Bitcoin Ticker'),
@@ -70,10 +80,11 @@ class _PriceScreenState extends State<PriceScreen> {
               elevation: 5,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0)),
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.all(15.0),
                 child: Text(
-                  '1 BTC = ? USD',
+                  // Updates the Text Widget
+                  '1 BTC = $bitCoinValueInUSD USD',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 20.0),
                 ),
@@ -86,7 +97,7 @@ class _PriceScreenState extends State<PriceScreen> {
             alignment: Alignment.center,
             padding: EdgeInsets.only(bottom: 30.0),
             child: Center(
-              child: detectPlatform(),
+              child: isIOS ? androidDropdown() : iosPicker(),
             ),
           )
         ],
