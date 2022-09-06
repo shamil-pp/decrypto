@@ -1,3 +1,4 @@
+import 'package:bitcoin_ticker/screens/crypto_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../utilities/coin_data.dart';
@@ -51,13 +52,18 @@ class _PriceScreenState extends State<PriceScreen> {
   }
 
   // Creates a property to hold the value and use in Text Widget
-  dynamic bitCoinValue = '?';
+  bool isWaiting = true;
+
+  // Adds coinValue into a map and stores the value of all 3 cryptocurrencies
+  Map<String, String> coinValuesMap = {};
 
   // Creates an async method to await the coin data from coin_data.dart
   void getData() async {
-    double coinOut = await coin.getCoinData(selectedCurrency);
+    isWaiting = true;
+    var cryptoMapOut = await coin.getCoinData(selectedCurrency);
+    isWaiting = false;
     setState(() {
-      bitCoinValue = coinOut.toInt();
+      coinValuesMap = cryptoMapOut;
     });
   }
 
@@ -80,32 +86,29 @@ class _PriceScreenState extends State<PriceScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          for (String cryptoCurrency in cryptoList)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0.0),
-              child: Card(
-                color: const Color(0xff1F1E2A),
-                elevation: 5,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0)),
-                child: Padding(
-                  padding: EdgeInsets.all(15.0),
-                  child: Text(
-                    // Updates the Text Widget
-                    '1 $cryptoCurrency = $bitCoinValue $selectedCurrency',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 20.0),
-                  ),
-                ),
-              ),
-            ),
+          CryptoCard(
+            cryptoCurrency: 'BTC',
+            selectedCurrency: selectedCurrency,
+            coinValue: isWaiting ? '?' : coinValuesMap['BTC'].toString(),
+          ),
+          CryptoCard(
+            cryptoCurrency: 'ETH',
+            selectedCurrency: selectedCurrency,
+            coinValue: isWaiting ? '?' : coinValuesMap['ETH'].toString(),
+          ),
+          CryptoCard(
+            cryptoCurrency: 'LTC',
+            selectedCurrency: selectedCurrency,
+            coinValue: isWaiting ? '?' : coinValuesMap['LTC'].toString(),
+          ),
           Container(
-            height: 150,
+            height: 200,
             color: const Color(0xff1F1E2A),
             alignment: Alignment.center,
             padding: EdgeInsets.only(bottom: 30.0),
             child: Center(
-              child: isIOS ? androidDropdown() : iosPicker(),
+              child:
+                  isIOS ? androidDropdown() : iosPicker(), // Shows the opposite
             ),
           )
         ],
