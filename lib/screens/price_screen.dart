@@ -10,7 +10,10 @@ class PriceScreen extends StatefulWidget {
 }
 
 class _PriceScreenState extends State<PriceScreen> {
-  String selectedCurrency = 'USD';
+  // Creates object of coin_data.dart
+  CoinData coin = CoinData();
+  // Default currency value
+  String selectedCurrency = 'AUD';
 
   DropdownButton androidDropdown() {
     return DropdownButton<String>(
@@ -24,6 +27,8 @@ class _PriceScreenState extends State<PriceScreen> {
       ],
       onChanged: (value) {
         selectedCurrency = value!;
+        // Call getData() when the dropdown changes
+        getData();
       },
     );
   }
@@ -35,22 +40,24 @@ class _PriceScreenState extends State<PriceScreen> {
     }
     return CupertinoPicker(
       itemExtent: 32.0,
-      onSelectedItemChanged: (selectedIndex) {
-        print(selectedIndex);
+      onSelectedItemChanged: (i) {
+        // Saves the selected currency index to selectedCurrency
+        selectedCurrency = currenciesList[i];
+        // Call getData() when the picker changes
+        getData();
       },
       children: pickerItems,
     );
   }
 
-  // Creates a variable to hold the value and use in Text Widget
-  dynamic bitCoinValueInUSD = '?';
+  // Creates a property to hold the value and use in Text Widget
+  dynamic bitCoinValue = '?';
 
   // Creates an async method to await the coin data from coin_data.dart
   void getData() async {
-    CoinData coin = CoinData();
-    double coinData = await coin.getCoinData();
+    double coinOut = await coin.getCoinData(selectedCurrency);
     setState(() {
-      bitCoinValueInUSD = coinData.toInt();
+      bitCoinValue = coinOut.toInt();
     });
   }
 
@@ -66,34 +73,35 @@ class _PriceScreenState extends State<PriceScreen> {
     bool isIOS = Theme.of(context).platform == TargetPlatform.iOS;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Bitcoin Ticker'),
-        backgroundColor: Colors.blue,
+        title: const Center(child: Text('ToCrypto')),
+        backgroundColor: const Color(0xff19AC6F),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Card(
-              color: Colors.lightBlueAccent,
-              elevation: 5,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0)),
-              child: Padding(
-                padding: EdgeInsets.all(15.0),
-                child: Text(
-                  // Updates the Text Widget
-                  '1 BTC = $bitCoinValueInUSD USD',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 20.0),
+          for (String cryptoCurrency in cryptoList)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0.0),
+              child: Card(
+                color: const Color(0xff1F1E2A),
+                elevation: 5,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0)),
+                child: Padding(
+                  padding: EdgeInsets.all(15.0),
+                  child: Text(
+                    // Updates the Text Widget
+                    '1 $cryptoCurrency = $bitCoinValue $selectedCurrency',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 20.0),
+                  ),
                 ),
               ),
             ),
-          ),
           Container(
             height: 150,
-            color: Colors.lightBlue,
+            color: const Color(0xff1F1E2A),
             alignment: Alignment.center,
             padding: EdgeInsets.only(bottom: 30.0),
             child: Center(
