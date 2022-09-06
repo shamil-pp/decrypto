@@ -1,3 +1,3 @@
-# bitcoin_ticker
+# ToCrypto
 
-A crypto currency price checking app built with flutter
+A Cryptocurrency converter app, made with Flutter 💙
