@@ -1,5 +1,5 @@
-# ToCrypto
+# DeCrypto
+![Brochure](https://github.com/shamil-pp/bitcoin-ticker/blob/master/doc/brochure.png)
 
-A Cryptocurrency converter app, made with Flutter 💙
+Displays the live exchange rates of BTC, ETH and LTC cryptocurrencies in over 20+ most traded currencies.
 
-Converts BTC, ETH and LTC into widely used 21 currencies.
